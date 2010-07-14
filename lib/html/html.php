@@ -1,29 +1,90 @@
 <?php
 /**
- * 
+ * basic class
  *
- * @author Jens
+ * @package html
  */
 class html {
 
+    /**
+     * the singleton instance
+     * @var object $instance
+     * @access private
+     * @access static
+     */
+    private static $instance = NULL;
+    /**
+     * instance of the html_head class
+     *
+     * @var object $head
+     * @access public
+     * @see html_head
+     */
     public $head        = null;
+    /**
+     * instance of the html_body class
+     *
+     * @var object $body
+     * @access public
+     * @see html_body
+     */
     public $body        = null;
+    /**
+     * instance of the html_foot class
+     *
+     * @var object $foot
+     * @access public
+     * @see html_foot
+     */
     public $foot        = null;
+    /**
+     * content to return/display
+     *
+     * @var string $content
+     * @access private
+     */
+    private $content     = '';
 
-    public $content     = '';
-
-    public function __construct() {
-        $this->head = new html_head();
-        $this->body = new html_body();
-        $this->foot = new html_foot();
-        return $this;
+    /**
+     * privatized constructor to force the usage of the init-singleton
+     * 
+     * @access private
+     * @see init()
+     */                         
+    private function __construct() {}
+    /**
+     * privatized magic-function to prevent external cloning of object
+     * 
+     * @access private 
+     */                   
+    private function __clone() {}
+    /**
+     * singleton initalizer
+     * 
+     * @access public
+     * @access static
+     * @return self::$instance
+     */                             
+    public static function init() {
+        if (self::$instance === NULL) {
+           self::$instance = new self;
+       }
+       self::$instance->head = new html_head();
+       self::$instance->body = new html_body();
+       self::$instance->foot = new html_foot();
+       return self::$instance;
     }
-
+    /**
+     * build the html output
+     * 
+     * @access public
+     * @return string $content built content
+     */                       
     public function build() {
-        $this->content.= $this->head->build();
-        $this->content.= $this->body->build();
-        $this->content.= $this->foot->build();
-        echo $this->content;
+        self::$instance->content.= self::$instance->head->build();
+        self::$instance->content.= self::$instance->body->build();
+        self::$instance->content.= self::$instance->foot->build();
+        return self::$instance->content;
     }
 
 }
@@ -33,6 +94,12 @@ class html {
  * #########################################################################################################################
  * head
  * #########################################################################################################################
+ */
+/**
+ * head class
+ *
+ * @package html
+ * @subpackage html_head
  */
 class html_head {
 
@@ -70,7 +137,12 @@ class html_head {
     }
 
 }
-
+/**
+ * css class
+ *
+ * @package html
+ * @subpackage html_head
+ */
 class html_head_css {
 
     public $content = '';
@@ -102,6 +174,12 @@ class html_head_css {
 
 }
 
+/**
+ * doctype class
+ *
+ * @package html
+ * @subpackage html_head
+ */
 class html_head_doctype {
 
     public $content = '';
@@ -119,7 +197,12 @@ class html_head_doctype {
 
 
 }
-
+/**
+ * js class
+ *
+ * @package html
+ * @subpackage html_head
+ */
 class html_head_js {
 
     public $content = '';
@@ -152,7 +235,12 @@ class html_head_js {
         }
     }
 }
-
+/**
+ * meta class
+ *
+ * @package html
+ * @subpackage html_head
+ */
 class html_head_meta {
 
     public $content = '';
@@ -196,7 +284,12 @@ class html_head_meta {
         }
     }
 }
-
+/**
+ * title class
+ *
+ * @package html
+ * @subpackage html_head
+ */
 class html_head_title {
 
     public $content = '';
@@ -226,6 +319,12 @@ class html_head_title {
  * body
  * #########################################################################################################################
  */
+/**
+ * body class
+ *
+ * @package html
+ * @subpackage html_body
+ */
 class html_body {
 
     public $content     = '';
@@ -238,6 +337,7 @@ class html_body {
     }
 
     public function build() {
+
         $this->content = TAB.'<body>'.CRLF;
         $this->content = TAB.'<div id="doc">'.CRLF;
 
@@ -270,14 +370,21 @@ class html_body {
     }
 }
 
+/**
+ * element class
+ *
+ * @package html
+ * @subpackage html_body
+ */
 
 class html_body_element {
-
 
     public $content = '';
     public $built   = false;
     public $id      = '';
     public $type    = '';
+
+    private $params = array();
 
     public function __construct($strID,$strType) {
         $this->id   = $strID;
@@ -285,9 +392,19 @@ class html_body_element {
         return $this;
     }
 
+    public function __set($name, $value) {
+        $this->params[$name] = $value;
+    }
+
     public function build() {
-        $this->content = TAB.TAB.'<'.$this->type.' id="'.$this->id.'">'.CRLF.$this->content;
-        $this->content.= TAB.TAB.'</'.$this->type.'>'.CRLF;
+        $myTag = new html_tag($this->type);
+        $myTag->id = $this->id;
+        foreach ($this->params as $key=>$val) {
+            $myTag->addParam($key, $val);
+        }
+        $myTag->addContent($this->content);
+        $this->content = $myTag->build();
+        unset($myTag);
         $this->built = true;
         return $this->content;
     }
@@ -297,6 +414,12 @@ class html_body_element {
     }
 
 }
+/**
+ * article class
+ *
+ * @package html
+ * @subpackage html_body
+ */
 
 class html_body_article {
 
@@ -331,6 +454,12 @@ class html_body_article {
     }
 
 }
+/**
+ * nav class
+ *
+ * @package html
+ * @subpackage html_body
+ */
 
 class html_body_nav {
 
@@ -346,46 +475,63 @@ class html_body_nav {
     }
 
     public function build() {
-        $this->content = TAB.TAB.'<nav id="'.$this->id.'">'.CRLF;
-        $this->content.= TAB.TAB.TAB.'<ul>'.CRLF;
+        $myNav = new html_tag('nav');
+        $myNav->id = $this->id;
+
+        $myUL = new html_tag('ul');
         foreach ($this->items as $item) {
-            $this->content.= TAB.TAB.TAB.TAB.$item.CRLF;
+            $myUL->addContent($item);
         }
-        $this->content.= TAB.TAB.TAB.'</ul>'.CRLF;
-        $this->content.= TAB.TAB.'</nav>'.CRLF;
+        $myNav->addContent($myUL->build());
+        $this->content = $myNav->build();
+        unset($myUL, $myNav);
         $this->built = true;
         return $this->content;
     }
 
     public function addItem($strID,$strTitle,$strLink='') {
         if ($strLink!='') {
-            $strTitle = '<a href="'.$strLink.'">'.$strTitle.'</a>';
+            $myLink = new html_tag('a');
+            $myLink->id = 'link_'.$strTitle;
+            $myLink->addParam('href',$strLink);
+            $myLink->addContent($strTitle);
+            $strTitle = $myLink->build();
+            unset($myLink);
         }
-        $this->items[$strID] = '<li id="'.$strID.'">'.$strTitle.'</li>';
+        $myItem = new html_tag('li');
+        $myItem->id = $strID;
+        $myItem->addContent($strTitle);
+        $this->items[$strID] = $myItem->build();
+        unset($myItem);
     }
 
 }
 
+//***************************************************************************************************************************
+// foot
+//***************************************************************************************************************************
+
 /**
- * #########################################################################################################################
- * foot
- * #########################################################################################################################
+ * foot class
+ *
+ * @package html
+ * @subpackage html_foot
  */
+
 class html_foot {
 
     public $content = '';
     public $built   = false;
 
     public function __construct() {
-
         return $this;
-
     }
 
     public function build() {
-		$myTag = new html_tag('html');
-		$
-        $this->content.= '</html>'.CRLF;
+        $myTag = new html_tag('html');
+	$myTag->onlyclose = true;
+        $this->content.= $myTag->build().CRLF;
+        unset($myTag);
         if (DEBUG) {
             $this->content.= '<!-- Build time: '.(time()-$_SESSION['timer']).'s -->';
         }
@@ -394,59 +540,141 @@ class html_foot {
 
 }
 
-
+//***************************************************************************************************************************
+// Base Tag-Class
+//***************************************************************************************************************************
+/**
+ * html_tag
+ *
+ * base class to build html-tags
+ * @package html
+ * @subpackage html_tag
+ */
 class html_tag {
 
-	public $built		= false;
-	public $id			= '';
+	/**
+     * $id
+     * @var string $id the id of the current tag
+     * @access public
+     */
+    public $id			= '';
+    /**
+     * $class
+     * @var string $class the css-class of the current tag
+     * @access public
+     */
 	public $class		= '';
+    /**
+     * $selfclose
+     * @var boolean $selfclose indicates whether the tag should be closed in opener, e.g. <br />
+     * @access public
+     */
 	public $selfclose	= false;
+    /**
+     * $onlyclose
+     * @var boolean $onlyclose only generates closing tag, e.g. </tag>
+     * @access public
+     */
 	public $onlyclose	= false;
+        public $onlyopen        = false;
+    /**
+     * $type
+     * @var string $type type of tag, tag name, e.g. head, html, p, ...
+     * @access private
+     */
+	private $_type		= '';
+    /**
+     * $params
+     * @var array $params, additional params in the tag, e.g. style,...
+     * @access private
+     */
+	private $_params		= array();
+    /**
+     * $content
+     * @var string $content this is the content within the tag
+     * @access private
+     */
+	private $_content	= '';
 
-	private $type		= '';
+    /**
+     * __construct
+     *
+     * class constructor
+     *
+     * @param string $strType type of tag, e.g. head, html, ...
+     * @return html_tag
+     * @access public
+     */
+    public function __construct($strType) {
+        $this->_type = $strType;
+        return $this;
+    }
 
-	private $params		= array();
-	private $content	= '';
-
-	public function __construct($strType) {
-		$this->type = $strType;
-		return $this;
+    /**
+     * addParam
+     *
+     * add several parameters to the tag
+     *
+     * @param string $strName the name of the parameter
+     * @param string $strContent the value of the parameter. if false only name is used as param, e.g. in video-sources for "autoplay"...
+     * @return void
+     */
+    public function addParam($strName, $strContent=false) {
+	if ($strName=='class') {
+            ($this->class!='') ? $this->class.=' '.$strContent : $this->class = $strContent;
+	} else {
+            $this->_params[$strName] = $strContent;
 	}
+    }
 
-	public function addParam($strName, $strContent) {
-		if ($strName=='class') {
-			($this->class!='') ? $this->class.=' '.$strContent : $this->class = $strContent;
-		} else {
-			$this->params[$strName] = $strContent;
-		}
+    /**
+     * addContent
+     *
+     * guess what!?
+     *
+     * @param string $strContent content in the tag
+     * @return void
+     */
+    public function addContent($strContent) {
+	$this->_content.=strval($strContent);
+    }
+
+    /**
+     * build
+     *
+     * build up the tag, incl. content
+     *
+     * @return string the built tag plus content
+     */
+    public function build() {
+        $retVal = '';
+        if ($this->onlyclose) {
+            return '</'.$this->_type.'>';
+        }
+	$retVal.='<'.$this->_type.' id="'.(($this->id!='') ? $this->id : $this->_type.'_'.md5(time())).'"';
+	if ($this->class!='') {
+            $retVal.=' class="'.$this->class.'"';
+        }
+	foreach ($this->_params as $key=>$val) {
+           if ($val) {
+               $retVal.=' '.$key.'="'.$val.'"';
+           } else {
+               $retVal.=' '.$key;
+           }
 	}
-
-	public function addContent($strContent) {
-		$this->content.=$strContent;
-	}
-
-	public function build() {
-		$retVal = '';
-		if ($this->onlyclose) {
-			return '</'.$this->type.'>';
-		}
-		$retVal.='<'.$this->type.' id="'.(($this->id!='') ? $this->id : $this->type.'_'.md5(time())).'"';
-
-		if ($this->class!='')
-			$retVal.=' class="'.$this->class.'"';
-
-		foreach ($this->params as $key=>$val) {
-			$retVal.=' '.$key.'="'.$val.'"';
-		}
-
-		if ($this->selfclose) {
-			$retVal.=' />';
-			return $retVal;
-		}
-
-		$retVal.='>'.$this->content.'</'.$this->type.'>';
-		return $retVal;
-	}
+	if ($this->selfclose) {
+            $retVal.=' />';
+            return $retVal;
+        }
+        $retVal.='>'.$this->_content;
+        if (!$this->onlyopen) {
+            $retVal.='</'.$this->_type.'>';
+        }
+        return $retVal;
+    }
 
 }
+
+
+
 ?>
