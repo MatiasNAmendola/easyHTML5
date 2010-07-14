@@ -1,7 +1,8 @@
 <?php
+error_reporting(E_ALL | E_STRICT);
 require_once './lib/system.php';
 
-$myHTML = new html();
+$myHTML = html::init();
 
 // Build up navigation
 $myHTML->body->add('nav','myNav');
@@ -54,5 +55,5 @@ $myHTML->body->add('footer','myFooter');
 
 
 
-$myHTML->build();
+echo $myHTML->build();
 ?>
