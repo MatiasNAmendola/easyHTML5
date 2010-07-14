@@ -8,8 +8,8 @@ $strInstallPath = str_replace('etc','',dirname(__FILE__)).'';
 
 $_SETTINGS = array (
 
-    'system_title'      => 'All the small things',
-    'system_version'    => '0.00.1',
+    'system_title'      => 'easyHTML5',
+    'system_version'    => '0.00.2',
 
     'path_etc'          => $strInstallPath.'etc'.DIRECTORY_SEPARATOR,
     'path_lib'          => $strInstallPath.'lib'.DIRECTORY_SEPARATOR,
