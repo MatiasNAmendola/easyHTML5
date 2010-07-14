@@ -69,9 +69,9 @@ class html {
         if (self::$instance === NULL) {
            self::$instance = new self;
        }
-       self::$instance->head = new html_head();
-       self::$instance->body = new html_body();
-       self::$instance->foot = new html_foot();
+       self::$instance->head = html_head::init();
+       self::$instance->body = html_body::init();
+       self::$instance->foot = html_foot::init();
        return self::$instance;
     }
     /**
@@ -103,6 +103,8 @@ class html {
  */
 class html_head {
 
+    private static $instance;
+
     public $css     = null;
     public $doctype = null;
     public $js      = null;
@@ -112,16 +114,38 @@ class html_head {
     public $content = '';
     public $built   = false;
 
-    public function __construct() {
-        $this->css      = new html_head_css();
-        $this->doctype  = new html_head_doctype();
-        $this->js       = new html_head_js();
-        $this->meta     = new html_head_meta();
-        $this->title    = new html_head_title();
-
-        return $this;
+    /**
+     * privatized constructor to force the usage of the init-singleton
+     *
+     * @access private
+     * @see init()
+     */
+    private function __construct() {}
+    /**
+     * privatized magic-function to prevent external cloning of object
+     *
+     * @access private
+     */
+    private function __clone() {}
+    /**
+     * singleton initalizer
+     *
+     * @access public
+     * @access static
+     * @return self::$instance
+     */
+    public static function init() {
+        if (self::$instance === NULL) {
+           self::$instance = new self;
+       }
+       self::$instance->css     = new html_head_css();
+       self::$instance->doctype = new html_head_doctype();
+       self::$instance->js      = new html_head_js();
+       self::$instance->meta    = new html_head_meta();
+       self::$instance->title   = new html_head_title();
+       return self::$instance;
     }
-
+    
     public function build() {
         $this->content = '';
         $this->content .= $this->doctype->build();
@@ -327,13 +351,45 @@ class html_head_title {
  */
 class html_body {
 
+    /**
+     * the singleton instance
+     * @var object $instance
+     * @access private
+     * @access static
+     */
+    private static $instance = NULL;
+
+
     public $content     = '';
     public $built       = false;
 
     public $elements    = array();
 
-    public function __construct() {
-        return $this;
+    /**
+     * privatized constructor to force the usage of the init-singleton
+     *
+     * @access private
+     * @see init()
+     */
+    private function __construct() {}
+    /**
+     * privatized magic-function to prevent external cloning of object
+     *
+     * @access private
+     */
+    private function __clone() {}
+    /**
+     * singleton initalizer
+     *
+     * @access public
+     * @access static
+     * @return self::$instance
+     */
+    public static function init() {
+        if (self::$instance === NULL) {
+           self::$instance = new self;
+       }
+       return self::$instance;
     }
 
     public function build() {
@@ -520,11 +576,36 @@ class html_body_nav {
 
 class html_foot {
 
+    private static $instance = NULL;
+
     public $content = '';
     public $built   = false;
 
-    public function __construct() {
-        return $this;
+   /**
+     * privatized constructor to force the usage of the init-singleton
+     *
+     * @access private
+     * @see init()
+     */
+    private function __construct() {}
+    /**
+     * privatized magic-function to prevent external cloning of object
+     *
+     * @access private
+     */
+    private function __clone() {}
+    /**
+     * singleton initalizer
+     *
+     * @access public
+     * @access static
+     * @return self::$instance
+     */
+    public static function init() {
+        if (self::$instance === NULL) {
+           self::$instance = new self;
+       }
+       return self::$instance;
     }
 
     public function build() {
