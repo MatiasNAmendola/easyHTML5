@@ -47,24 +47,24 @@ class html {
 
     /**
      * privatized constructor to force the usage of the init-singleton
-     * 
+     *
      * @access private
      * @see init()
-     */                         
+     */
     private function __construct() {}
     /**
      * privatized magic-function to prevent external cloning of object
-     * 
-     * @access private 
-     */                   
+     *
+     * @access private
+     */
     private function __clone() {}
     /**
      * singleton initalizer
-     * 
+     *
      * @access public
      * @access static
      * @return self::$instance
-     */                             
+     */
     public static function init() {
         if (self::$instance === NULL) {
            self::$instance = new self;
@@ -76,10 +76,10 @@ class html {
     }
     /**
      * build the html output
-     * 
+     *
      * @access public
      * @return string $content built content
-     */                       
+     */
     public function build() {
         self::$instance->content.= self::$instance->head->build();
         self::$instance->content.= self::$instance->body->build();
@@ -110,7 +110,7 @@ class html_head {
     public $js      = null;
     public $meta    = null;
     public $title   = null;
-    
+
     public $content = '';
     public $built   = false;
 
@@ -466,7 +466,7 @@ class html_body {
         // else we got the default handler
         } else {
             $this->$strTitle = new html_body_element($strTitle,$strType);
-         
+
         }
         if ($this->$strTitle) {
             $this->elements[$strTitle]  = $this->$strTitle;
@@ -810,4 +810,3 @@ class html_tag {
 
 
 
-?>
