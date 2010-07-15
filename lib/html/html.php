@@ -145,18 +145,42 @@ class html_head {
        self::$instance->title   = new html_head_title();
        return self::$instance;
     }
-    
+	/**
+	 * build the content from the initialized subobjects
+	 *
+	 * @return string $content built content
+	 */
     public function build() {
-        $this->content = '';
-        $this->content .= $this->doctype->build();
-        $this->content .= '<html lang="de">'.CRLF;
-        $this->content .= TAB.'<head>'.CRLF;
-        $this->content .= $this->title->build();
-        $this->content .= $this->meta->build();
-        $this->content .= $this->css->build();
-        $this->content .= $this->js->build();
-        $this->content .= TAB.'</head>'.CRLF;
-        return $this->content;
+
+		$this->content = $this->doctype->build();
+
+		$myHTML = new html_tag('html');
+		$myHTML->noid = true;
+		$myHTML->onlyopen = true;
+		$myHTML->addParam('lang', settings::get('system_language'));
+
+		$myHead = new html_tag('head');
+		$myHead->noid = true;
+		if (!$this->title->built) {
+			$myHead->addContent($this->title->build());
+		}
+		if (!$this->meta->built) {
+			$myHead->addContent($this->meta->build());
+		}
+		if (!$this->css->built) {
+			$myHead->addContent($this->css->build());
+		}
+		if (!$this->js->built) {
+			$myHead->addContent($this->js->build());
+		}
+
+		$myHTML->addContent($myHead->build());
+
+		$this->content.=$myHTML->build();
+
+		unset($myHTML,$myHead);
+
+		return $this->content;
 
     }
 
@@ -184,7 +208,7 @@ class html_head_css {
             $this->add('system.css');
         }
         foreach ($this->css as $cssLine) {
-            $this->content .= TAB.TAB.$cssLine.CRLF;
+            $this->content .= $cssLine;
         }
         return $this->content;
     }
@@ -192,7 +216,15 @@ class html_head_css {
     public function add($strCSSFile, $strMedia='screen') {
         if (substr($strCSSFile,-4)!='.css') $strCSSFile = $strCSSFile.'.css';
         if (file_exists(settings::get('path_css').$strCSSFile)) {
-            $this->css[$strCSSFile] = '<link rel="stylesheet" type="text/css" href="'.settings::get('web_css').$strCSSFile.'" media="'.$strMedia.'" />';
+			$myTag = new html_tag('link');
+			$myTag->selfclose = true;
+			$myTag->noid = true;
+			$myTag->addParam('rel', 'stylesheet');
+			$myTag->addParam('type', 'text/css');
+			$myTag->addParam('href', settings::get('web_css').$strCSSFile);
+			$myTag->addParam('media', $strMedia);
+            $this->css[$strCSSFile] = $myTag->build();
+			unset($myTag);
         }
     }
 
@@ -247,7 +279,7 @@ class html_head_js {
             $this->add('system.js');
         }
         foreach ($this->js as $jsLine) {
-            $this->content .= TAB.TAB.$jsLine.CRLF;
+            $this->content .= $jsLine;
         }
         return $this->content;
     }
@@ -255,7 +287,12 @@ class html_head_js {
     public function add($strJSFile) {
         if (substr($strJSFile,-3)!='.js') $strJSFile = $strJSFile.'.js';
         if (file_exists(settings::get('path_js').$strJSFile)) {
-            $this->js[$strJSFile] = '<script type="text/javascript" src="'.settings::get('web_css').$strJSFile.'"></script>';
+			$myTag = new html_tag('script');
+			$myTag->noid = true;
+			$myTag->addParam('type'	, 'text/javascript');
+			$myTag->addParam('src'	, settings::get('web_js').$strJSFile);
+            $this->js[$strJSFile] = $myTag->build();
+			unset($myTag);
         }
     }
 }
@@ -278,15 +315,18 @@ class html_head_meta {
 
     public function build() {
         foreach ($this->meta as $metaLine) {
-            $this->content .= TAB.TAB.$metaLine.CRLF;
+            $this->content .= $metaLine;
         }
         return $this->content;
     }
 
     public function add($strName, $strValue) {
+		$myTag = new html_tag('meta');
+		$myTag->selfclose = true;
+		$myTag->noid = true;
         switch ($strName) {
 			case 'charset':
-				$this->meta[$strName] = '<meta charset="'.$strValue.'" />';
+				$myTag->addParam('charset', $strValue);
 				break;
             case 'content-type':
             case 'content-language':
@@ -295,7 +335,8 @@ class html_head_meta {
             case 'set-cookie':
             case 'cache-control':
             case 'pragma':
-            	$this->meta[$strName] = '<meta http-equiv="'.$strName.'" content="'.$strValue.'" />';
+            	$myTag->addParam('http-equiv', $strName);
+				$myTag->addParam('content', $strValue);
                 break;
             case 'author':
             case 'date':
@@ -303,9 +344,12 @@ class html_head_meta {
             case 'keywords':
             case 'robots':
             default:
-            	$this->meta[$strName] = '<meta name="'.$strName.'" content="'.$strValue.'" />';
+				$myTag->addParam('name', $strName);
+				$myTag->addParam('content', $strValue);
                 break;
         }
+		$this->meta[$strName] = $myTag->build();
+		unset($myTag);
     }
 }
 /**
@@ -329,7 +373,11 @@ class html_head_title {
         if ($this->title == '') {
             $this->title = settings::get('system_title'). ' | Version ' . settings::get('system_version');
         }
-        $this->content = TAB.TAB.'<title>'.$this->title.'</title>'.CRLF;
+		$myTag = new html_tag('title');
+		$myTag->addContent($this->title);
+        $this->content = $myTag->build();
+		unset($myTag);
+		$this->built = true;
         return $this->content;
     }
 
@@ -657,7 +705,8 @@ class html_tag {
      * @access public
      */
 	public $onlyclose	= false;
-        public $onlyopen        = false;
+    public $onlyopen    = false;
+	public $noid		= false;
     /**
      * $type
      * @var string $type type of tag, tag name, e.g. head, html, p, ...
@@ -730,20 +779,23 @@ class html_tag {
     public function build() {
         $retVal = '';
         if ($this->onlyclose) {
-            return '</'.$this->_type.'>';
+            return CRLF.'</'.$this->_type.'>';
         }
-	$retVal.='<'.$this->_type.' id="'.(($this->id!='') ? $this->id : $this->_type.'_'.md5(time())).'"';
-	if ($this->class!='') {
+		$retVal.=CRLF.'<'.$this->_type;
+		if (!$this->noid) {
+			$retVal.=' id="'.(($this->id!='') ? $this->id : $this->_type.'_'.md5(time())).'"';
+		}
+		if ($this->class!='') {
             $retVal.=' class="'.$this->class.'"';
         }
-	foreach ($this->_params as $key=>$val) {
+		foreach ($this->_params as $key=>$val) {
            if ($val) {
                $retVal.=' '.$key.'="'.$val.'"';
            } else {
                $retVal.=' '.$key;
            }
-	}
-	if ($this->selfclose) {
+		}
+		if ($this->selfclose) {
             $retVal.=' />';
             return $retVal;
         }

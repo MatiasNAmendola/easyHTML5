@@ -6,7 +6,7 @@ session_start();
 /**
  * include the global settings
  */
-require_once './etc/settings.php';
+require_once './etc/easyHTML5.php';
 /**
  * start timer if DEBUG is true
  */
@@ -43,6 +43,8 @@ function __autoload($strClassName) {
 
 /**
  * settings class
+ *
+ * @package settings
  */
 class settings {
     /**
@@ -60,6 +62,8 @@ class settings {
 
 /**
  * system class
+ *
+ * @package system
  */
 class system {
 

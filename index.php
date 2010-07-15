@@ -1,8 +1,10 @@
 <?php
 error_reporting(E_ALL | E_STRICT);
-require_once './lib/system.php';
+require_once './lib/easyHTML5.php';
 
 $myHTML = html::init();
+
+$myHTML->head->meta->add('author', 'Jens Reinemuth');
 
 // Build up navigation
 $myHTML->body->add('nav','myNav');
