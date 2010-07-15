@@ -157,7 +157,7 @@ class html_head {
 		$myHTML = new html_tag('html');
 		$myHTML->noid = true;
 		$myHTML->onlyopen = true;
-		$myHTML->addParam('lang', settings::get('system_language'));
+		$myHTML->addParam('lang', easyHTML5_settings::get('system_language'));
 
 		$myHead = new html_tag('head');
 		$myHead->noid = true;
@@ -215,13 +215,13 @@ class html_head_css {
 
     public function add($strCSSFile, $strMedia='screen') {
         if (substr($strCSSFile,-4)!='.css') $strCSSFile = $strCSSFile.'.css';
-        if (file_exists(settings::get('path_css').$strCSSFile)) {
+        if (file_exists(easyHTML5_settings::get('path_css').$strCSSFile)) {
 			$myTag = new html_tag('link');
 			$myTag->selfclose = true;
 			$myTag->noid = true;
 			$myTag->addParam('rel', 'stylesheet');
 			$myTag->addParam('type', 'text/css');
-			$myTag->addParam('href', settings::get('web_css').$strCSSFile);
+			$myTag->addParam('href', easyHTML5_settings::get('web_css').$strCSSFile);
 			$myTag->addParam('media', $strMedia);
             $this->css[$strCSSFile] = $myTag->build();
 			unset($myTag);
@@ -286,11 +286,11 @@ class html_head_js {
 
     public function add($strJSFile) {
         if (substr($strJSFile,-3)!='.js') $strJSFile = $strJSFile.'.js';
-        if (file_exists(settings::get('path_js').$strJSFile)) {
+        if (file_exists(easyHTML5_settings::get('path_js').$strJSFile)) {
 			$myTag = new html_tag('script');
 			$myTag->noid = true;
 			$myTag->addParam('type'	, 'text/javascript');
-			$myTag->addParam('src'	, settings::get('web_js').$strJSFile);
+			$myTag->addParam('src'	, easyHTML5_settings::get('web_js').$strJSFile);
             $this->js[$strJSFile] = $myTag->build();
 			unset($myTag);
         }
@@ -371,7 +371,7 @@ class html_head_title {
 
     public function build() {
         if ($this->title == '') {
-            $this->title = settings::get('system_title'). ' | Version ' . settings::get('system_version');
+            $this->title = easyHTML5_settings::get('system_title'). ' | Version ' . easyHTML5_settings::get('system_version');
         }
 		$myTag = new html_tag('title');
 		$myTag->addContent($this->title);

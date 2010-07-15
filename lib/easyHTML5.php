@@ -30,7 +30,7 @@ function __autoload($strClassName) {
         //} else {
             $className = $classFolder = $strClassName;
         //}
-        $strClassFile = settings::get('path_lib').$classFolder.DIRECTORY_SEPARATOR.$className.'.php';
+        $strClassFile = easyHTML5_settings::get('path_lib').$classFolder.DIRECTORY_SEPARATOR.$className.'.php';
         if (!file_exists($strClassFile)) {
             throw new exception('Class '.$strClassName. ' not found!');
         } else {
@@ -46,7 +46,7 @@ function __autoload($strClassName) {
  *
  * @package settings
  */
-class settings {
+class easyHTML5_settings {
     /**
      * returns the value of the given settings-variable
      *
@@ -56,7 +56,7 @@ class settings {
      * @access public
      */
     static function get($strName) {
-        return ((isset($_SESSION['settings'][$strName]) ? $_SESSION['settings'][$strName] : NULL));
+        return ((isset($_SESSION['easyHTML5_settings'][$strName]) ? $_SESSION['easyHTML5_settings'][$strName] : NULL));
     }
 }
 
@@ -65,7 +65,7 @@ class settings {
  *
  * @package system
  */
-class system {
+class easyHTML5_system {
 
     /**
      * 

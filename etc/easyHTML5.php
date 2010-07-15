@@ -6,7 +6,7 @@ define('DEBUG'  ,true);
 
 $strInstallPath = str_replace('etc','',dirname(__FILE__)).'';
 
-$_SETTINGS = array (
+$_SETTINGS_easyHTML5 = array (
 
     'system_title'      => 'easyHTML5',
     'system_version'    => '0.00.2',
@@ -22,6 +22,6 @@ $_SETTINGS = array (
     'web_js'            => './share/js/',
 );
 
-$_SESSION['settings'] = $_SETTINGS;
+$_SESSION['easyHTML5_settings'] = $_SETTINGS_easyHTML5;
 
 ?>
