@@ -1,6 +1,6 @@
 <?php
-error_reporting(E_ALL | E_STRICT);
 require_once './lib/easyHTML5.php';
+
 
 $myHTML = html::init();
 
