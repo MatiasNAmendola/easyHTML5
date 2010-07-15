@@ -1,18 +1,11 @@
 <?php
 error_reporting(E_ALL | E_STRICT);
-<<<<<<< HEAD
 require_once './lib/easyHTML5.php';
 
 $myHTML = html::init();
 
 $myHTML->head->meta->add('author', 'Jens Reinemuth');
 
-=======
-require_once './lib/system.php';
-
-$myHTML = html::init();
-
->>>>>>> f97792fcf46945d105cd1cb33cb72b2ac4bdcf5e
 // Build up navigation
 $myHTML->body->add('nav','myNav');
 $myHTML->body->myNav->addItem('item1','Link1','#');
